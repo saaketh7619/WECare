@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.uid == '3Zy82h75J8eWhGjEPNk5Eyxnvk63' ||
+        ('email' in request.auth.token && (
+          request.auth.token.email == 'saaketh7619@gmail.com' ||
+          request.auth.token.email.lower() == 'saaketh7619@gmail.com'
+        ))
+      );
+    }
+
+    // Health check / connection test document
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+
+    // User Profile Rules: authenticated user has full read and write access to their own profile, admin has full access
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow list: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow write: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+    }
+
+    // Appointment Bookings Rules:
+    match /bookings/{bookingId} {
+      // Allow fetching single appointment
+      allow get: if isSignedIn() && (isAdmin() || resource == null || resource.data.userId == request.auth.uid);
+
+      // Allow querying collection: admin can list all, patient can list where userId == request.auth.uid
+      allow list: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+
+      // Allow creating an appointment: admin or self
+      allow create: if isSignedIn() && (isAdmin() || request.resource.data.userId == request.auth.uid);
+
+      // Allow updating or deleting appointments: admin or owner
+      allow update, delete: if isSignedIn() && (isAdmin() || resource.data.userId == request.auth.uid);
+    }
+  }
+}
+
+

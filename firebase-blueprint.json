@@ -1,0 +1,58 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Registered hospital patient or user profile",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique Firebase Authentication UID" },
+        "name": { "type": "string", "description": "Full name of the user", "maxLength": 100 },
+        "email": { "type": "string", "description": "Email address of the user", "maxLength": 120 },
+        "phone": { "type": "string", "description": "Contact phone number", "maxLength": 30 },
+        "role": { "type": "string", "description": "User role", "enum": ["patient", "admin"] },
+        "createdAt": { "type": "string", "description": "Account creation timestamp" },
+        "updatedAt": { "type": "string", "description": "Account update timestamp" }
+      },
+      "required": ["uid", "name", "email", "role"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "Hospital appointment reservation record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Booking reference code", "maxLength": 50 },
+        "userId": { "type": "string", "description": "UID of the user who booked" },
+        "patientName": { "type": "string", "description": "Name of the patient", "maxLength": 100 },
+        "patientEmail": { "type": "string", "description": "Patient contact email", "maxLength": 120 },
+        "patientPhone": { "type": "string", "description": "Patient phone number", "maxLength": 30 },
+        "patientAge": { "type": "number", "description": "Patient age in years" },
+        "patientGender": { "type": "string", "description": "Patient gender", "enum": ["Male", "Female", "Other", "Prefer not to say"] },
+        "departmentId": { "type": "string", "description": "Department ID", "maxLength": 50 },
+        "departmentName": { "type": "string", "description": "Department name", "maxLength": 100 },
+        "doctorId": { "type": "string", "description": "Doctor ID", "maxLength": 50 },
+        "doctorName": { "type": "string", "description": "Doctor full name", "maxLength": 100 },
+        "doctorPhoto": { "type": "string", "description": "Doctor profile photo URL" },
+        "appointmentDate": { "type": "string", "description": "Date of appointment YYYY-MM-DD", "maxLength": 20 },
+        "appointmentTime": { "type": "string", "description": "Time slot", "maxLength": 30 },
+        "consultationType": { "type": "string", "description": "Type of consultation", "enum": ["in-person", "teleconsult"] },
+        "chiefComplaint": { "type": "string", "description": "Symptoms or reason for visit", "maxLength": 500 },
+        "status": { "type": "string", "description": "Status of appointment", "enum": ["Confirmed", "Completed", "Cancelled", "Rescheduled"] },
+        "roomNumber": { "type": "string", "description": "Consultation room or virtual suite", "maxLength": 50 },
+        "consultationFee": { "type": "number", "description": "Consultation fee amount" },
+        "notes": { "type": "string", "description": "Additional instructions", "maxLength": 500 },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["id", "userId", "patientName", "patientEmail", "departmentId", "doctorId", "appointmentDate", "appointmentTime", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Stores user profiles restricted to the account owner"
+    },
+    "/bookings/{bookingId}": {
+      "schema": { "$ref": "#/entities/Booking" },
+      "description": "Stores appointment booking records owned and queryable by the booking user"
+    }
+  }
+}

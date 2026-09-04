@@ -1,0 +1,6 @@
+{
+  "name": "WECare Hospitals",
+  "description": "Modern healthcare portal for WECare Hospitals featuring comprehensive clinical departments, specialized doctors, and online appointment booking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
